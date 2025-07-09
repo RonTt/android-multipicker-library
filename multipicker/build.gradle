@@ -51,20 +51,12 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-}
 
-/*gradle.taskGraph.whenReady { taskGraph ->
-    if (taskGraph.hasTask(':app:assembleRelease') || taskGraph.hasTask(':app:packageRelease')) {
-        *//**
-         * Configure Release key
-         *//*
-        def props = new Properties()
-        props.load(new FileInputStream(rootProject.file("extras/secret.properties")))
-        android.signingConfigs.release.keyAlias props.getProperty("alias")
-        android.signingConfigs.release.storePassword props.getProperty('keyStorePassword')
-        android.signingConfigs.release.keyPassword props.getProperty('keyAliasPassword')
+    publishing {
+        singleVariant("release")      // <-- ключ!
+        // при желании: withSourcesJar()
     }
-}*/
+}
 
 dependencies {
     compileOnly 'androidx.appcompat:appcompat:1.7.1'
@@ -76,11 +68,11 @@ afterEvaluate {
     publishing {
         publications {
             release(MavenPublication) {
-                from components.findByName("release")
+                from components.release           // ← компонент точно существует
 
-                groupId = 'com.kbeanie'
+                groupId    = 'com.github.RonTt'    // (как у deinlandel)
                 artifactId = 'android-multipicker-library'
-                version = '1.7-jitpack6'
+                version    = '1.7-jitpack7'        // или считайте из tag/gradle.properties
             }
         }
     }
