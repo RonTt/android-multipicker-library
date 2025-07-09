@@ -3,7 +3,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
 version = "1.7"
-group = "com.github.rontt"
+group = "com.kbeanie"
 
 signing {
     required {
@@ -31,7 +31,7 @@ android {
         minSdkVersion 29
         targetSdkVersion 34
         versionCode 1
-        versionName "1.0"
+        versionName "1.7"
     }
     buildTypes {
         release {
