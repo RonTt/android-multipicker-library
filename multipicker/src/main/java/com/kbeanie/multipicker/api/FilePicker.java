@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.kbeanie.multipicker.api.callbacks.FilePickerCallback;
@@ -32,7 +33,7 @@ public class FilePicker extends PickerManager {
      * Constructor for choosing a file from an {@link Activity}
      * @param activity
      */
-    public FilePicker(Activity activity) {
+    public FilePicker(AppCompatActivity activity) {
         super(activity, Picker.PICK_FILE);
     }
 

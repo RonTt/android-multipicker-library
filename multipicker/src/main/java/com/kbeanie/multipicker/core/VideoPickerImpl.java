@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
@@ -37,7 +38,7 @@ public abstract class VideoPickerImpl extends PickerManager {
     private boolean generateMetadata = true;
     private int quality = 100;
 
-    public VideoPickerImpl(Activity activity, int pickerType) {
+    public VideoPickerImpl(AppCompatActivity activity, int pickerType) {
         super(activity, pickerType);
     }
 

@@ -2,8 +2,6 @@ package com.kbeanie.multipicker.sample;
 
 import android.app.Application;
 
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.RequestConfiguration;
 import com.kbeanie.multipicker.core.PickerManager;
 
 import java.util.Arrays;
@@ -12,13 +10,10 @@ import java.util.Arrays;
  * Created by kbibek on 2/18/16.
  */
 public class AbApplication extends Application {
-    private MobileAds mobileAds;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        MobileAds.initialize(this);
-        setupAdmobConfiguration();
         PickerManager.debugglable = true;
     }
 
@@ -33,9 +28,4 @@ public class AbApplication extends Application {
 
     private final static String[] TEST_DEVICES = {GALAXY_TAB, NEXUS_S, TEST_DEVICE_ID_2, TEST_GALAXY_NEXUS, TEST_OPO, TEMP_DEVICE, XIAOMI, ONEPLUS_6};
 
-    private void setupAdmobConfiguration() {
-        RequestConfiguration.Builder builder = new RequestConfiguration.Builder();
-        builder.setTestDeviceIds(Arrays.asList(TEST_DEVICES.clone()));
-        MobileAds.setRequestConfiguration(builder.build());
-    }
 }

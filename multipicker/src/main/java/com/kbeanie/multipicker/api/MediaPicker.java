@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.kbeanie.multipicker.api.callbacks.FilePickerCallback;
@@ -44,7 +45,7 @@ public class MediaPicker extends PickerManager implements FilePickerCallback, Im
      *
      * @param activity
      */
-    public MediaPicker(Activity activity) {
+    public MediaPicker(AppCompatActivity activity) {
         super(activity, Picker.PICK_MEDIA);
     }
 
@@ -103,13 +104,10 @@ public class MediaPicker extends PickerManager implements FilePickerCallback, Im
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            intent.setType("*/*");
-            String[] mimeTypes = {"image/*", "video/*"};
-            intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
-        } else {
-            intent.setType("image/*, video/*");
-        }
+        intent.setType("*/*");
+        String[] mimeTypes = {"image/*", "video/*"};
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+
         if (extras != null) {
             intent.putExtras(extras);
         }
@@ -137,7 +135,6 @@ public class MediaPicker extends PickerManager implements FilePickerCallback, Im
      *
      * @param intent
      */
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public void submit(Intent intent) {
         List<String> uris = new ArrayList<>();

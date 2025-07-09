@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.kbeanie.multipicker.api.callbacks.AudioPickerCallback;
@@ -33,7 +34,7 @@ public class AudioPicker extends PickerManager {
      * Constructor to choose an audio file from an {@link Activity}
      * @param activity
      */
-    public AudioPicker(Activity activity) {
+    public AudioPicker(AppCompatActivity activity) {
         super(activity, Picker.PICK_AUDIO);
     }
 

@@ -2,6 +2,7 @@ package com.kbeanie.multipicker.api;
 
 import android.app.Activity;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.kbeanie.multipicker.api.exceptions.PickerException;
@@ -16,7 +17,7 @@ public class CameraImagePicker extends ImagePickerImpl {
      *
      * @param activity
      */
-    public CameraImagePicker(Activity activity) {
+    public CameraImagePicker(AppCompatActivity activity) {
         super(activity, Picker.PICK_IMAGE_CAMERA);
     }
 
@@ -44,7 +45,7 @@ public class CameraImagePicker extends ImagePickerImpl {
      * @param activity
      * @param path
      */
-    public CameraImagePicker(Activity activity, String path) {
+    public CameraImagePicker(AppCompatActivity activity, String path) {
         super(activity, Picker.PICK_IMAGE_CAMERA);
         reinitialize(path);
     }

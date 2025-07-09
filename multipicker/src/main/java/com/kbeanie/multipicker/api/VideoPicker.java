@@ -2,6 +2,7 @@ package com.kbeanie.multipicker.api;
 
 import android.app.Activity;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.kbeanie.multipicker.api.exceptions.PickerException;
@@ -16,7 +17,7 @@ public class VideoPicker extends VideoPickerImpl {
      *
      * @param activity
      */
-    public VideoPicker(Activity activity) {
+    public VideoPicker(AppCompatActivity activity) {
         super(activity, Picker.PICK_VIDEO_DEVICE);
     }
 

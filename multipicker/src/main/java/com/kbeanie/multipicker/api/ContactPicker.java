@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.provider.ContactsContract;
 import android.util.Log;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.kbeanie.multipicker.api.callbacks.ContactPickerCallback;
@@ -30,7 +31,7 @@ public class ContactPicker extends PickerManager {
      *
      * @param activity
      */
-    public ContactPicker(Activity activity) {
+    public ContactPicker(AppCompatActivity activity) {
         super(activity, Picker.PICK_CONTACT);
     }
 

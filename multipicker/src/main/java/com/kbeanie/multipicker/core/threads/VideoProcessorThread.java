@@ -53,14 +53,14 @@ public final class VideoProcessorThread extends FileProcessorThread {
             try {
                 postProcessVideo(video);
                 video.setSuccess(true);
-            } catch (PickerException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 video.setSuccess(false);
             }
         }
     }
 
-    private void postProcessVideo(ChosenVideo video) throws PickerException {
+    private void postProcessVideo(ChosenVideo video) throws PickerException, IOException {
         if (shouldGenerateMetadata) {
             MediaMetadataRetriever metadataRetriever = new MediaMetadataRetriever();
             try {

@@ -2,6 +2,7 @@ package com.kbeanie.multipicker.api;
 
 import android.app.Activity;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.kbeanie.multipicker.api.exceptions.PickerException;
@@ -15,7 +16,7 @@ public class ImagePicker extends ImagePickerImpl {
      * Constructor for choosing an image from an {@link Activity}
      * @param activity
      */
-    public ImagePicker(Activity activity) {
+    public ImagePicker(AppCompatActivity activity) {
         super(activity, Picker.PICK_IMAGE_DEVICE);
     }
 
