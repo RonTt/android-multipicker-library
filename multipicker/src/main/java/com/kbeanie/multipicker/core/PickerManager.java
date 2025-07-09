@@ -12,7 +12,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.OpenableColumns;
-import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import com.kbeanie.multipicker.api.CacheLocation;
 import com.kbeanie.multipicker.api.exceptions.PickerException;
@@ -29,7 +36,7 @@ import storage.StoragePreferences;
  */
 public abstract class PickerManager {
     private final static String TAG = PickerManager.class.getSimpleName();
-    protected Activity activity;
+    protected AppCompatActivity activity;
     protected Fragment fragment;
     protected android.app.Fragment appFragment;
 
@@ -45,7 +52,7 @@ public abstract class PickerManager {
 
     protected boolean allowMultiple;
 
-    public PickerManager(Activity activity, int pickerType) {
+    public PickerManager(AppCompatActivity activity, int pickerType) {
         this.activity = activity;
         this.pickerType = pickerType;
         initProperties();
@@ -63,7 +70,7 @@ public abstract class PickerManager {
         initProperties();
     }
 
-    private void initProperties(){
+    private void initProperties() {
         debugglable = new StoragePreferences(getContext()).isDebuggable();
     }
 
@@ -103,6 +110,7 @@ public abstract class PickerManager {
      * option to set the folder name now. If at all you need to copy the files into the public
      * sotrage for exposing them to other applications, you will have to implement the
      * copying/moving the files code yourself.
+     *
      * @param folderName
      */
     @Deprecated
@@ -119,7 +127,7 @@ public abstract class PickerManager {
     protected abstract String pick() throws PickerException;
 
     /**
-     * This method should be called after {@link Activity#onActivityResult(int, int, Intent)} is  called.
+     * This method should be called after onActivityResult is  called.
      *
      * @param data
      */
@@ -161,12 +169,31 @@ public abstract class PickerManager {
         return null;
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    protected void newPickMedia() {
+        ActivityResultLauncher<PickVisualMediaRequest> pickMedia = activity.registerForActivityResult(
+                new ActivityResultContracts.PickMultipleVisualMedia(),
+                uris -> {
+                    if (uris != null && !uris.isEmpty()) {
+                        for (Uri uri : uris) {
+                            Toast.makeText(activity, "tttest Selected URI: " + uri, Toast.LENGTH_SHORT).show();
+                            Log.d("tttest", "tttest Selected URI: %s" + uris);
+                        }
+                    } else {
+                        Toast.makeText(activity, "No media selected", Toast.LENGTH_SHORT).show();
+                        Log.d("tttest", "tttest No media selected");
+                    }
+                }
+        );
+        pickMedia.launch(
+                new PickVisualMediaRequest.Builder()
+                        .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                        .build()
+        );
+    }
+
     protected void pickInternal(Intent intent, int type) {
         if (allowMultiple) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            }
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
         }
         if (activity != null) {
             activity.startActivityForResult(intent, type);
@@ -240,11 +267,11 @@ public abstract class PickerManager {
         return file.getAbsolutePath();
     }
 
-    protected String getFileProviderAuthority(){
-        return getContext().getPackageName()+".multipicker.fileprovider";
+    protected String getFileProviderAuthority() {
+        return getContext().getPackageName() + ".multipicker.fileprovider";
     }
 
-    public void setDebugglable(boolean debugglable){
+    public void setDebugglable(boolean debugglable) {
         new StoragePreferences(getContext()).setDebuggable(debugglable);
     }
 }

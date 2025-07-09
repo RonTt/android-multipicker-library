@@ -36,12 +36,14 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.ref.SoftReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
@@ -244,51 +246,44 @@ public class FileProcessorThread extends Thread {
     }
 
     protected ChosenFile getFromContentProvider(ChosenFile file) throws PickerException {
-
-        BufferedInputStream inputStream = null;
-        BufferedOutputStream outStream = null;
-        ParcelFileDescriptor parcelFileDescriptor = null;
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
         try {
-            String localFilePath = generateFileName(file);
-            parcelFileDescriptor = context
-                    .getContentResolver().openFileDescriptor(Uri.parse(file.getOriginalPath()),
-                            "r");
-            verifyStream(file.getOriginalPath(), parcelFileDescriptor);
-
-            FileDescriptor fileDescriptor = parcelFileDescriptor
-                    .getFileDescriptor();
-
-            inputStream = new BufferedInputStream(new FileInputStream(fileDescriptor));
-            String mimeType = URLConnection.guessContentTypeFromStream(inputStream);
-            BufferedInputStream reader = new BufferedInputStream(inputStream);
-
-            outStream = new BufferedOutputStream(
-                    new FileOutputStream(localFilePath));
-            byte[] buf = new byte[2048];
-            int len;
-            while ((len = reader.read(buf)) > 0) {
-                outStream.write(buf, 0, len);
+            Uri uri = Uri.parse(file.getOriginalPath());
+            inputStream = context.getContentResolver().openInputStream(uri);
+            if (inputStream == null) {
+                throw new PickerException("Cannot open input stream from URI: " + file.getOriginalPath());
             }
-            flush(outStream);
-            file.setOriginalPath(localFilePath);
-            if (file.getMimeType() != null && file.getMimeType().contains("/*")) {
+            String fileName = generateFileName(file);
+            File outFile = new File(context.getExternalFilesDir(null), fileName);
+            outputStream = Files.newOutputStream(outFile.toPath());
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+
+            outputStream.flush();
+            file.setOriginalPath(outFile.getAbsolutePath());
+            if (file.getMimeType() == null || file.getMimeType().contains("/*")) {
+                String mimeType = context.getContentResolver().getType(uri);
+                if (mimeType == null) {
+                    mimeType = URLConnection.guessContentTypeFromStream(new BufferedInputStream(new FileInputStream(outFile)));
+                }
                 if (mimeType != null && !mimeType.isEmpty()) {
                     file.setMimeType(mimeType);
                 } else {
-                    file.setMimeType(guessMimeTypeFromUrl(file.getOriginalPath(), file.getType()));
+                    file.setMimeType(guessMimeTypeFromUrl(outFile.getAbsolutePath(), file.getType()));
                 }
             }
+
         } catch (IOException e) {
             throw new PickerException(e);
         } catch (Exception e) {
             throw new PickerException(e.getLocalizedMessage());
         } finally {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                close(parcelFileDescriptor);
-            }
-            flush(outStream);
-            close(outStream);
             close(inputStream);
+            close(outputStream);
         }
         return file;
     }
@@ -377,14 +372,12 @@ public class FileProcessorThread extends Thread {
                     return data;
                 }
                 Uri contentUri = uri;
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
 
-                String[] contentUriPrefixesToTry = new String[]{
-                        "content://downloads/public_downloads",
-                        "content://downloads/my_downloads"
-                };
-
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-
+                    String[] contentUriPrefixesToTry = new String[]{
+                            "content://downloads/public_downloads",
+                            "content://downloads/my_downloads"
+                    };
                     for (String contentUriPrefix : contentUriPrefixesToTry) {
                         contentUri = ContentUris.withAppendedId(Uri.parse(contentUriPrefix), Long.valueOf(id));
                         try {
@@ -395,13 +388,10 @@ public class FileProcessorThread extends Thread {
                         } catch (Exception ignored) {
                         }
                     }
-
                 } else {
                     return getDataAndMimeType(contentUri, null, null, file.getType());
                 }
             }
-
-
             // MediaProvider
             else if (isMediaDocument(uri)) {
                 final String docId = DocumentsContract.getDocumentId(uri);
@@ -439,7 +429,7 @@ public class FileProcessorThread extends Thread {
             return data;
         }
 
-        return null;
+        return new String[]{null, null};
     }
 
     private String[] getDataAndMimeType(Uri uri, String selection,
@@ -464,7 +454,7 @@ public class FileProcessorThread extends Thread {
             if (cursor != null)
                 cursor.close();
         }
-        return null;
+        return data;
     }
 
     private boolean isExternalStorageDocument(Uri uri) {
@@ -590,10 +580,13 @@ public class FileProcessorThread extends Thread {
             }
         }
 
-        String probableFileName = fileName;
-        File probableFile = new File(getTargetDirectory(file.getDirectoryType()) + File.separator
-                + probableFileName);
-        return probableFile.getAbsolutePath();
+        File targetDir = context.getExternalFilesDir(file.getDirectoryType());
+        if (targetDir == null) {
+            throw new PickerException("External files directory not available");
+        }
+
+        File targetFile = new File(targetDir, fileName);
+        return targetFile.getAbsolutePath();
     }
 
     private String generateFileName(ChosenFile file) throws PickerException {
@@ -658,6 +651,7 @@ public class FileProcessorThread extends Thread {
     }
 
     protected ChosenImage ensureMaxWidthAndHeight(int maxWidth, int maxHeight, int quality, ChosenImage image, boolean shouldRotateBitmap) {
+        FileOutputStream stream = null;
         try {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
@@ -687,7 +681,7 @@ public class FileProcessorThread extends Thread {
                     File file = new File(
                             (original.getParent() + File.separator + original.getName()
                                     .replace(".", "-resized.")));
-                    FileOutputStream stream = new FileOutputStream(file);
+                    stream = new FileOutputStream(file);
 
                     Matrix matrix = new Matrix();
                     matrix.postScale((float) scaledDimension[0] / imageWidth, (float) scaledDimension[1] / imageHeight);
@@ -712,7 +706,13 @@ public class FileProcessorThread extends Thread {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace(); //TODO proper exception handling
+            e.printStackTrace();
+        } finally {
+            try {
+                close(stream);
+            } catch (PickerException e) {
+                e.printStackTrace();
+            }
         }
         return image;
     }
@@ -894,7 +894,7 @@ public class FileProcessorThread extends Thread {
         try {
             ExifInterface exif = new ExifInterface(path);
             width = exif.getAttribute(ExifInterface.TAG_IMAGE_WIDTH);
-            if (width.equals("0")) {
+            if ("0".equals(width)) {
                 SoftReference<Bitmap> bmp = getBitmapImage(path);
                 width = Integer.toString(bmp.get().getWidth());
                 bmp.clear();
@@ -910,7 +910,7 @@ public class FileProcessorThread extends Thread {
         try {
             ExifInterface exif = new ExifInterface(path);
             height = exif.getAttribute(ExifInterface.TAG_IMAGE_LENGTH);
-            if (height.equals("0")) {
+            if ("0".equals(height)) {
                 SoftReference<Bitmap> bmp = getBitmapImage(path);
                 height = Integer.toString(bmp.get().getHeight());
                 bmp.clear();

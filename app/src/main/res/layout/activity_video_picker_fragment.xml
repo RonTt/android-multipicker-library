@@ -13,5 +13,5 @@
         android:layout_weight="1"
         tools:layout="@layout/fragment_video_picker" />
 
-    <include layout="@layout/ad_view" />
+
 </LinearLayout>

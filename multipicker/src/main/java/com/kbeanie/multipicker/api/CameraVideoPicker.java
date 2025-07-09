@@ -1,7 +1,9 @@
 package com.kbeanie.multipicker.api;
 
 import android.app.Activity;
-import android.support.v4.app.Fragment;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import com.kbeanie.multipicker.api.exceptions.PickerException;
 import com.kbeanie.multipicker.core.VideoPickerImpl;
@@ -15,7 +17,7 @@ public class CameraVideoPicker extends VideoPickerImpl {
      * Constructor for triggering Video capture from an {@link Activity}
      * @param activity
      */
-    public CameraVideoPicker(Activity activity) {
+    public CameraVideoPicker(AppCompatActivity activity) {
         super(activity, Picker.PICK_VIDEO_CAMERA);
     }
 
@@ -40,7 +42,7 @@ public class CameraVideoPicker extends VideoPickerImpl {
      * @param activity
      * @param path
      */
-    public CameraVideoPicker(Activity activity, String path) {
+    public CameraVideoPicker(AppCompatActivity activity, String path) {
         super(activity, Picker.PICK_VIDEO_CAMERA);
         reinitialize(path);
     }

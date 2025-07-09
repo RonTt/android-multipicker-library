@@ -14,5 +14,5 @@
         android:layout_weight="1" />
 
 
-    <include layout="@layout/ad_view" />
+
 </LinearLayout>

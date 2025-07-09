@@ -1,15 +1,9 @@
 apply plugin: 'com.android.library'
-//apply plugin: 'maven'
-apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
-version = "1.6"
-group = "com.github.deinlandel"
-
-def sonatypeRepo = ""
-def sonatypeUsername = ""
-def sonatypePassword = ""
-def scmUrl = ""
+version = "1.7"
+group = "com.github.rontt"
 
 signing {
     required {
@@ -64,9 +58,12 @@ signing {
             }
         }
     }
-}*/
+}
+*/
 
 android {
+    namespace 'com.kbeanie.multipicker'
+
     signingConfigs {
         release {
             keyAlias ""
@@ -76,12 +73,11 @@ android {
         }
     }
 
-    compileSdkVersion 27
-    buildToolsVersion '28.0.3'
+    compileSdkVersion 34
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 27
+        minSdkVersion 29
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
     }
@@ -99,6 +95,10 @@ android {
             }
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 gradle.taskGraph.whenReady { taskGraph ->
@@ -115,7 +115,7 @@ gradle.taskGraph.whenReady { taskGraph ->
 }
 
 dependencies {
-    compileOnly 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'junit:junit:4.12'
-    implementation 'com.android.support:support-v4:27.1.1'
+    compileOnly 'androidx.appcompat:appcompat:1.7.1'
+    testImplementation 'junit:junit:4.13.2'
+
 }

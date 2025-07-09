@@ -7,6 +7,7 @@ import com.kbeanie.multipicker.api.callbacks.AudioPickerCallback;
 import com.kbeanie.multipicker.api.entity.ChosenAudio;
 import com.kbeanie.multipicker.api.entity.ChosenFile;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -29,11 +30,15 @@ public final class AudioProcessorThread extends FileProcessorThread {
     private void postProcessAudios() {
         for (ChosenFile file : files) {
             ChosenAudio audio = (ChosenAudio) file;
-            postProcessAudio(audio);
+            try {
+                postProcessAudio(audio);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
-    private void postProcessAudio(ChosenAudio audio) {
+    private void postProcessAudio(ChosenAudio audio) throws IOException {
         MediaMetadataRetriever metadataRetriever = new MediaMetadataRetriever();
         try {
             metadataRetriever.setDataSource(audio.getOriginalPath());
