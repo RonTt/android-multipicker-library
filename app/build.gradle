@@ -5,10 +5,10 @@ android {
     namespace 'com.kbeanie.multipicker.sample'
     signingConfigs {
         release {
-            keyAlias ""
+            /*keyAlias ""
             keyPassword ""
             storeFile file('../extras/release.keystore')
-            storePassword ""
+            storePassword ""*/
         }
     }
     compileSdkVersion 34
@@ -40,11 +40,11 @@ android {
     }
 }
 
-gradle.taskGraph.whenReady { taskGraph ->
+/*gradle.taskGraph.whenReady { taskGraph ->
     if (taskGraph.hasTask(':app:assembleRelease') || taskGraph.hasTask(':app:packageRelease')) {
-        /**
+        *//**
          * Configure Release key
-         */
+         *//*
         def props = new Properties()
         props.load(new FileInputStream(rootProject.file("extras/secret.properties")))
         android.signingConfigs.release.keyAlias props.getProperty("alias")
@@ -55,7 +55,7 @@ gradle.taskGraph.whenReady { taskGraph ->
         println android.signingConfigs.release.storePassword
         println android.signingConfigs.release.keyPassword
     }
-}
+}*/
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
