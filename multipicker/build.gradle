@@ -78,9 +78,9 @@ afterEvaluate {
             release(MavenPublication) {
                 from components.findByName("release")
 
-                groupId = 'com.github.RonTt'
+                groupId = 'com.kbeanie'
                 artifactId = 'android-multipicker-library'
-                version = '1.7-jitpack4'
+                version = '1.7-jitpack6'
             }
         }
     }
