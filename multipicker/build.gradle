@@ -54,7 +54,6 @@ android {
 
     publishing {
         singleVariant("release")      // <-- ключ!
-        // при желании: withSourcesJar()
     }
 }
 
@@ -68,11 +67,11 @@ afterEvaluate {
     publishing {
         publications {
             release(MavenPublication) {
-                from components.release           // ← компонент точно существует
+                from components.release
 
-                groupId    = 'com.github.RonTt'    // (как у deinlandel)
+                groupId    = 'com.github.RonTt'
                 artifactId = 'android-multipicker-library'
-                version    = '1.7-jitpack7'        // или считайте из tag/gradle.properties
+                version    = '1.7-jitpack8'
             }
         }
     }

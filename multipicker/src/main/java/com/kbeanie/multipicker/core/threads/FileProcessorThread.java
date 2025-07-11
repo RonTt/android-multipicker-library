@@ -12,7 +12,6 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.os.ParcelFileDescriptor;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.text.TextUtils;
@@ -254,8 +253,8 @@ public class FileProcessorThread extends Thread {
             if (inputStream == null) {
                 throw new PickerException("Cannot open input stream from URI: " + file.getOriginalPath());
             }
-            String fileName = generateFileName(file);
-            File outFile = new File(context.getExternalFilesDir(null), fileName);
+            String localFilePath = generateFileName(file);
+            File outFile = new File(localFilePath);
             outputStream = Files.newOutputStream(outFile.toPath());
             byte[] buffer = new byte[4096];
             int bytesRead;
