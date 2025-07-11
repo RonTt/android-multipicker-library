@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 
@@ -11,6 +12,7 @@ import androidx.core.content.ContextCompat;
 
 import android.util.Log;
 
+import com.kbeanie.multipicker.api.entity.ChosenFile;
 import com.kbeanie.multipicker.api.exceptions.PickerException;
 
 import java.io.File;
@@ -105,19 +107,18 @@ public class FileUtils {
         return directory.getAbsolutePath();
     }
 
-    public static void copyFile(File source, File destination) throws IOException {
-        copyFile(source, destination, true);
+    public static void copyFile(ChosenFile source, File destination, Context context) throws IOException {
+        copyFile(source, destination, true, context);
     }
 
-    public static void copyFile(File srcFile, File destFile,
-                                boolean preserveFileDate) throws IOException {
-        if (srcFile == null) {
-            throw new NullPointerException("Source must not be null");
-        }
+    public static void copyFile(ChosenFile file, File destFile,
+                                boolean preserveFileDate, Context context) throws IOException {
+        File srcFile = new File(file.getOriginalPath());
+
         if (destFile == null) {
             throw new NullPointerException("Destination must not be null");
         }
-        if (srcFile.exists() == false) {
+        if (!srcFile.exists()) {
             throw new FileNotFoundException("Source '" + srcFile + "' does not exist");
         }
         if (srcFile.isDirectory()) {
@@ -126,23 +127,26 @@ public class FileUtils {
         if (srcFile.getCanonicalPath().equals(destFile.getCanonicalPath())) {
             throw new IOException("Source '" + srcFile + "' and destination '" + destFile + "' are the same");
         }
-        if (destFile.getParentFile() != null && destFile.getParentFile().exists() == false) {
-            if (destFile.getParentFile().mkdirs() == false) {
+        if (destFile.getParentFile() != null && !destFile.getParentFile().exists()) {
+            if (!destFile.getParentFile().mkdirs()) {
                 throw new IOException("Destination '" + destFile + "' directory cannot be created");
             }
         }
-        if (destFile.exists() && destFile.canWrite() == false) {
+        if (destFile.exists() && !destFile.canWrite()) {
             throw new IOException("Destination '" + destFile + "' exists but is read-only");
         }
-        doCopyFile(srcFile, destFile, preserveFileDate);
+        doCopyFile(file, destFile, preserveFileDate, context);
     }
 
-    private static void doCopyFile(File srcFile, File destFile, boolean preserveFileDate) throws IOException {
+    private static void doCopyFile(ChosenFile file, File destFile, boolean preserveFileDate, Context context) throws IOException {
         if (destFile.exists() && destFile.isDirectory()) {
             throw new IOException("Destination '" + destFile + "' exists but is a directory");
         }
 
-        FileInputStream input = new FileInputStream(srcFile);
+        File srcFile = new File(file.getQueryUri());
+        Uri srcUri = Uri.parse(file.getQueryUri());
+
+        InputStream input = context.getContentResolver().openInputStream(srcUri);
         try {
             FileOutputStream output = new FileOutputStream(destFile);
             try {
@@ -155,10 +159,6 @@ public class FileUtils {
             input.close();
         }
 
-        if (srcFile.length() != destFile.length()) {
-            throw new IOException("Failed to copy full contents from '" +
-                    srcFile + "' to '" + destFile + "'");
-        }
         if (preserveFileDate) {
             destFile.setLastModified(srcFile.lastModified());
         }

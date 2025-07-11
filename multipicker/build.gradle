@@ -71,7 +71,7 @@ afterEvaluate {
 
                 groupId    = 'com.github.RonTt'
                 artifactId = 'android-multipicker-library'
-                version    = '1.7-jitpack8'
+                version    = '1.7-jitpack9'
             }
         }
     }

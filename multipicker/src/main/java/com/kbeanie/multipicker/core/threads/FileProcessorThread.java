@@ -152,9 +152,8 @@ public class FileProcessorThread extends Thread {
             return;
         }
         try {
-            File inputFile = new File(file.getOriginalPath());
             File copyTo = new File(outputPath);
-            FileUtils.copyFile(inputFile, copyTo);
+            FileUtils.copyFile(file, copyTo, context);
             file.setOriginalPath(copyTo.getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();
