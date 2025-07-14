@@ -32,11 +32,6 @@ public class FileUtils {
     private final static String TAG = FileUtils.class.getSimpleName();
 
     public static String getExternalFilesDirectory(String type, Context context) throws PickerException {
-        /*boolean permissionGranted = checkForExternalStorageRuntimePermission(context);
-        if (!permissionGranted) {
-            Log.e(TAG, Manifest.permission.WRITE_EXTERNAL_STORAGE + " permission not available");
-            throw new PickerException(Manifest.permission.WRITE_EXTERNAL_STORAGE + " permission not available");
-        }*/
         File directory = Environment.getExternalStorageDirectory();
         String appName = getAppName(context);
         String appDirectory = directory.getAbsolutePath() + File.separator + appName;
@@ -77,13 +72,6 @@ public class FileUtils {
     }
 
     public static String getExternalFilesDir(String type, Context context) throws PickerException {
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            boolean permissionGranted = checkForExternalStorageRuntimePermission(context);
-            if (!permissionGranted) {
-                Log.e(TAG, Manifest.permission.WRITE_EXTERNAL_STORAGE + " permission not available");
-                throw new PickerException(Manifest.permission.WRITE_EXTERNAL_STORAGE + " permission not available");
-            }
-        }*/
         File directory = context.getExternalFilesDir(type);
         if (directory == null) {
             throw new PickerException("Couldn't initialize External Files Directory");
