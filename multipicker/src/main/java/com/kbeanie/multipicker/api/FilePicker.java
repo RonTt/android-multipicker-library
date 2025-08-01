@@ -97,13 +97,14 @@ public class FilePicker extends PickerManager {
         if (callback == null) {
             throw new PickerException("FilePickerCallback is null!!! Please set one");
         }
-        String action = Intent.ACTION_GET_CONTENT;
+        String action = Intent.ACTION_OPEN_DOCUMENT;
         Intent intent = new Intent(action);
         intent.setType(mimeType);
         if (extras != null) {
             intent.putExtras(extras);
         }
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION |
+                Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         pickInternal(intent, pickerType);
         return null;
